@@ -1,0 +1,30 @@
+#!/bin/bash
+
+REPEAT=50
+echo;
+echo '############ ############ STARTING ############ ############'
+echo;
+for i in {1..5}; do
+	(echo $i | update-alternatives --config java) > /dev/null;
+	MEASURE_NAME=cfs-JVM-$i;
+	MEASURE_CONTENT=$MEASURE_NAME.txt
+	CSV_FILE=$MEASURE_NAME.csv
+	FULL_LOG=$MEASURE_NAME-FULL.txt
+	sudo -u rhein java --version >>$MEASURE_CONTENT;
+	(energy --info=full --repeat=$REPEAT --redirect='' --term --sampling=1.0:10 -- - "${@:1}")| tee -a $FULL_LOG
+        cat $FULL_LOG | tail -n $(($REPEAT+1)) >> $MEASURE_CONTENT
+	cat $FULL_LOG | tail -n $(($REPEAT+1)) >> $CSV_FILE
+	chown rhein:rhein $MEASURE_CONTENT
+	chown rhein:rhein $CSV_FILE
+	chown rhein:rhein $FULL_LOG
+	chmod +rw $MEASURE_CONTENT
+	chmod +rw $CSV_FILE
+	chmod +rw $FULL_LOG
+	echo;
+	echo '@@@@@@@@@@ @@@@@@@@@@ MEASURED '$i' YET @@@@@@@@@@ @@@@@@@@@@'
+	echo;
+done;
+echo;
+echo '############ ############ FINISHED ############ ############'
+echo;
+

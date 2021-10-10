@@ -1,0 +1,91 @@
+#!/bin/bash
+
+REPEAT=50
+echo;
+echo '############ ############ STARTING ############ ############'
+echo;
+## cfs enterprise edition
+
+MEASURE_NAME=cfs-native-ee;
+MEASURE_CONTENT=$MEASURE_NAME.txt
+CSV_FILE=$MEASURE_NAME.csv
+FULL_LOG=$MEASURE_NAME-FULL.txt
+
+(energy --info=full --repeat=$REPEAT --redirect='' --term --sampling=1.0:10 -- - ../native-ee/tsp-0.1.0-ct ulysses16.tsp 6)| tee -a $FULL_LOG
+cat $FULL_LOG | tail -n $(($REPEAT+1)) >> $MEASURE_CONTENT
+cat $FULL_LOG | tail -n $(($REPEAT+1)) >> $CSV_FILE
+chown rhein:rhein $MEASURE_CONTENT
+chown rhein:rhein $CSV_FILE
+chown rhein:rhein $FULL_LOG
+chmod +rw $MEASURE_CONTENT
+chmod +rw $CSV_FILE
+chmod +rw $FULL_LOG
+
+echo;
+echo '@@@@@@@@@@ @@@@@@@@@@ MEASURED CFS Enterprise ! @@@@@@@@@@ @@@@@@@@@@'
+echo;
+
+## cfs community edition
+
+MEASURE_NAME=cfs-native-ce;
+MEASURE_CONTENT=$MEASURE_NAME.txt
+CSV_FILE=$MEASURE_NAME.csv
+FULL_LOG=$MEASURE_NAME-FULL.txt
+
+(energy --info=full --repeat=$REPEAT --redirect='' --term --sampling=1.0:10 -- - ../native-ce/tsp-0.1.0-ct ulysses16.tsp 6)| tee -a $FULL_LOG
+cat $FULL_LOG | tail -n $(($REPEAT+1)) >> $MEASURE_CONTENT
+cat $FULL_LOG | tail -n $(($REPEAT+1)) >> $CSV_FILE
+chown rhein:rhein $MEASURE_CONTENT
+chown rhein:rhein $CSV_FILE
+chown rhein:rhein $FULL_LOG
+chmod +rw $MEASURE_CONTENT
+chmod +rw $CSV_FILE
+chmod +rw $FULL_LOG
+
+echo;
+echo '@@@@@@@@@@ @@@@@@@@@@ MEASURED CFS Community ! @@@@@@@@@@ @@@@@@@@@@'
+echo;
+
+## eteam enterprise edition
+
+MEASURE_NAME=eteam-native-ee;
+MEASURE_CONTENT=$MEASURE_NAME.txt
+CSV_FILE=$MEASURE_NAME.csv
+FULL_LOG=$MEASURE_NAME-FULL.txt
+
+(sudo -u rhein energy --info=full --repeat=$REPEAT --redirect='' --term --sampling=1.0:10 -- ? ../native-ee/tsp-0.1.0-ct ulysses16.tsp 6)| tee -a $FULL_LOG
+cat $FULL_LOG | tail -n $(($REPEAT+1)) >> $MEASURE_CONTENT
+cat $FULL_LOG | tail -n $(($REPEAT+1)) >> $CSV_FILE
+chown rhein:rhein $MEASURE_CONTENT
+chown rhein:rhein $CSV_FILE
+chown rhein:rhein $FULL_LOG
+chmod +rw $MEASURE_CONTENT
+chmod +rw $CSV_FILE
+chmod +rw $FULL_LOG
+
+echo;
+echo '@@@@@@@@@@ @@@@@@@@@@ MEASURED ETEAM Enterprise ! @@@@@@@@@@ @@@@@@@@@@'
+echo;
+
+## eteam community edition
+
+MEASURE_NAME=eteam-native-ce;
+MEASURE_CONTENT=$MEASURE_NAME.txt
+CSV_FILE=$MEASURE_NAME.csv
+FULL_LOG=$MEASURE_NAME-FULL.txt
+
+(sudo -u rhein energy --info=full --repeat=$REPEAT --redirect='' --term --sampling=1.0:10 -- ? ../native-ce/tsp-0.1.0-ct ulysses16.tsp 6)| tee -a $FULL_LOG
+cat $FULL_LOG | tail -n $(($REPEAT+1)) >> $MEASURE_CONTENT
+cat $FULL_LOG | tail -n $(($REPEAT+1)) >> $CSV_FILE
+chown rhein:rhein $MEASURE_CONTENT
+chown rhein:rhein $CSV_FILE
+chown rhein:rhein $FULL_LOG
+chmod +rw $MEASURE_CONTENT
+chmod +rw $CSV_FILE
+chmod +rw $FULL_LOG
+
+echo;
+echo '@@@@@@@@@@ @@@@@@@@@@ MEASURED ETEAM Community ! @@@@@@@@@@ @@@@@@@@@@'
+echo;
+
+

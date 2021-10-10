@@ -1,0 +1,65 @@
+#!/bin/bash
+
+TOTAL_TARGET_SAMPLE_CNT=50
+REPEAT_PER_CMD=2
+
+JVM_V_ARR=( $(java --version | sed "2q;d") )
+JVM_VERSION='UNKNOWN'
+
+#### GET JVM VERSION WORKS:
+if [[ ${JVM_V_ARR[0]} == 'OpenJDK' ]]; then
+# open
+	if [[ ${JVM_V_ARR[3]} == 'GraalVM' ]]; then
+		JVM_VERSION='GraalVM_CE';
+	elif [[ ${JVM_V_ARR[3]} = Corretto*  ]]; then
+		JVM_VERSION='Corretto'
+	else 
+		JVM_VERSION='Hotspot_CE'
+	fi;
+elif [[ ${JVM_V_ARR[0]} == 'Java(TM)'  ]]; then
+# commercial
+	if [[ ${JVM_V_ARR[4]} == 'GraalVM' ]]; then
+		JVM_VERSION='GraalVM_EE'
+	else
+		JVM_VERSION='Hotspot_EE'
+	fi;
+fi;
+####
+echo 'JVM Version is: ' $JVM_VERSION
+
+if [[ $JVM_VERSION == 'UNKNOWN' ]]; then
+	return -1;
+fi
+
+CSV_FILE_NAME=$JVM_VERSION.csv
+TMP_FILE_NAME="$JVM_VERSION"_PARTIAL.txt
+MISSING_SAMPLE_CNT=$TOTAL_TARGET_SAMPLE_CNT
+
+while [ "$MISSING_SAMPLE_CNT" -gt 0 ]; do
+	if [ -f "$CSV_FILE_NAME" ]; then
+		TMP_CNT=$(wc -l < "$CSV_FILE_NAME")
+		MISSING_SAMPLE_CNT=$(($TOTAL_TARGET_SAMPLE_CNT-$TMP_CNT+1))
+	fi
+	if [ "$MISSING_SAMPLE_CNT" -le 0 ]; then
+		break;
+	elif [ "$MISSING_SAMPLE_CNT" -eq 1 ]; then
+		REPEAT_PER_CMD=1
+	fi
+
+	echo "Missing $MISSING_SAMPLE_CNT samples"
+
+	echo 'Began running at:' $(date)
+	(energy --repeat=$REPEAT_PER_CMD --sampling=1.0:25 -- ? "${@:1}")| tee $TMP_FILE_NAME
+	echo 'Last finished run at:' $(date)
+
+	if [ -f "$CSV_FILE_NAME" ]; then
+		echo "CSV File $CSV_FILE_NAME already exists! Appending..."
+		(cat $TMP_FILE_NAME | tail -n $REPEAT_PER_CMD) >> $CSV_FILE_NAME	
+	else
+		echo 'Creating new CSV File: ' $CSV_FILE_NAME
+		(cat $TMP_FILE_NAME | tail -n $(($REPEAT_PER_CMD+1))) > $CSV_FILE_NAME
+	fi
+	echo 'clean run'
+	"${@:1}"
+done
+rm $TMP_FILE_NAME
